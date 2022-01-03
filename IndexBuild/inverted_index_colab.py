@@ -117,19 +117,19 @@ class InvertedIndex:
         the tf of tokens, then update the index (in memory, no storage 
         side-effects).
     """
-	self.N += 1
+    self.N += 1
     w2cnt = Counter(tokens)
     self.term_total.update(w2cnt)
-	doc_size = 0
+    doc_size = 0
     for w, cnt in w2cnt.items():
       self.df[w] = self.df.get(w, 0) + 1
       self._posting_list[w].append((doc_id, cnt))
-	  doc_size += cnt
-	self.doc_len[doc_id] = doc_size
-	sum = 0
-	for w, cnt in w2cnt.items():
-		sum += ((cnt/doc_size)*math.log(self.N/self.df[w],2))**2
-	self.doc_vector_size[doc_id] = sum**0.5
+      doc_size += cnt
+    self.doc_len[doc_id] = doc_size
+    sum = 0
+    for w, cnt in w2cnt.items():
+      sum += ((cnt/doc_size)*math.log(self.N/self.df[w],2))**2
+    self.doc_vector_size[doc_id] = sum**0.5
 
   def write_index(self, base_dir, name):
     """ Write the in-memory index to disk. Results in the file: 

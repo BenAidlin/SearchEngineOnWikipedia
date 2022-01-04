@@ -1,4 +1,7 @@
+import math
+from collections import defaultdict,Counter
 from flask import Flask, request, jsonify
+from inverted_index_gcp.py import MultiFileReader
 
 class MyFlaskApp(Flask):
     def run(self, host=None, port=None, debug=None, **options):
@@ -53,12 +56,48 @@ def search_body():
     '''
     res = []
     query = request.args.get('query', '')
+
     if len(query) == 0:
       return jsonify(res)
     # BEGIN SOLUTION
-
+    terms = query.split()
+    # create query vector
+    q_vec = Counter(terms)
+    body_index = MultiFileReader.read_index(base_dir, name)
+    queries_posting_lists = {}
+    doc_vectors_by_query = {}
+    set_of_relevant_docs = set()
+    for term in q_vec.keys():
+        # get posting list of the term
+        post_list = body_index.read_posting_list(term)
+        queries_posting_lists[term] = dict(post_list)
+        # ger all relevant docs
+        for doc_id, freq in post_list:
+            set_of_relevant_docs.add(doc_id)
+    number_of_relevant_doc = min(100, len(set_of_relevant_docs))
+    # create doc vector for all relevant docs
+    for doc_id in set_of_relevant_docs:
+        vec = {}
+        for term, post_lst in queries_posting_lists.items():
+            tf_idf = 0
+            if doc_id in post_lst:
+                tf = post_lst[doc_id] / body_index.doc_len[doc_id]
+                idf = math.log(body_index.N/body_index.df[term], 2)
+                tf_idf = tf*idf
+            vec[term] = tf_idf
+        doc_vectors_by_query[doc_id] = vec
+    cos_sim_lst = []
+    q_size = sum([i**2 for i in q_vec.elements()])**0.5
+    for doc_id, d_vec in doc_vectors_by_query.items():
+        to_add = ((doc_id, f"title of {doc_id}"), cosine_similarity(d_vec, q_vec, body_index.doc_len[doc_id], q_size))
+        cos_sim_lst.append(to_add)
+    res = [x[0] for x in sorted(cos_sim_lst, lambda x: x[1], reverse=True)][:number_of_relevant_doc]
     # END SOLUTION
     return jsonify(res)
+
+def cosine_similarity(d_vec, q_vec, d_size, q_size):
+    dot_mul = sum([d_vec[term]*tfidf for term, tfidf in q_vec.keys()])
+    return dot_mul/(d_size*q_size)
 
 @app.route("/search_title")
 def search_title():

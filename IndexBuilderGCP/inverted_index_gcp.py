@@ -120,7 +120,7 @@ class InvertedIndex:
         ######################################################################
         self.doc_len = Counter()
         
-        self.doc_vector_size = Counter()
+        self.doc_vector_size = defaultdict(lambda x: 0)
         
         self.N = len(docs)
         ######################################################################
@@ -179,6 +179,17 @@ class InvertedIndex:
                     posting_list.append((doc_id, tf))
                 yield w, posting_list
 
+    def read_posting_list(self, w):
+        with closing(MultiFileReader()) as reader:
+            locs = self.posting_locs[w]
+            b = reader.read(locs, self.df[w] * TUPLE_SIZE)
+            posting_list = []
+            for i in range(self.df[w]):
+                doc_id = int.from_bytes(b[i * TUPLE_SIZE:i * TUPLE_SIZE + 4], 'big')
+                tf = int.from_bytes(b[i * TUPLE_SIZE + 4:(i + 1) * TUPLE_SIZE], 'big')
+                posting_list.append((doc_id, tf))
+            return posting_list
+
     @staticmethod
     def read_index(base_dir, name):
         with open(Path(base_dir) / f'{name}.pkl', 'rb') as f:
@@ -219,5 +230,7 @@ class InvertedIndex:
         bucket = client.bucket(bucket_name)
         blob_posting_locs = bucket.blob(f"postings_gcp/{bucket_id}_posting_locs.pickle")
         blob_posting_locs.upload_from_filename(f"{bucket_id}_posting_locs.pickle")
+
+
     
 

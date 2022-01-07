@@ -1,7 +1,7 @@
 import math
 from collections import defaultdict,Counter
 from flask import Flask, request, jsonify
-from inverted_index_gcp.py import MultiFileReader
+from IndexBuilderGCP.inverted_index_gcp import MultiFileReader
 
 class MyFlaskApp(Flask):
     def run(self, host=None, port=None, debug=None, **options):
@@ -10,6 +10,10 @@ class MyFlaskApp(Flask):
 app = MyFlaskApp(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
+
+MIN_TF_IDF_THRESH = 0.45
+BASE_DIR = ""  # TODO: ...
+INDEX_NAME = ""  # TODO: ...
 
 @app.route("/search")
 def search():
@@ -40,6 +44,7 @@ def search():
 
 @app.route("/search_body")
 def search_body():
+    # TODO: change code, no tf idf calc needed, consider tfidf thresh
     ''' Returns up to a 100 search results for the query using TFIDF AND COSINE
         SIMILARITY OF THE BODY OF ARTICLES ONLY. DO NOT use stemming. DO USE the 
         staff-provided tokenizer from Assignment 3 (GCP part) to do the 
@@ -63,7 +68,7 @@ def search_body():
     terms = query.split()
     # create query vector
     q_vec = Counter(terms)
-    body_index = MultiFileReader.read_index(base_dir, name)
+    body_index = MultiFileReader.read_index(BASE_DIR, INDEX_NAME)
     queries_posting_lists = {}
     doc_vectors_by_query = {}
     set_of_relevant_docs = set()
@@ -89,7 +94,7 @@ def search_body():
     cos_sim_lst = []
     q_size = sum([i**2 for i in q_vec.elements()])**0.5
     for doc_id, d_vec in doc_vectors_by_query.items():
-        to_add = ((doc_id, f"title of {doc_id}"), cosine_similarity(d_vec, q_vec, body_index.doc_len[doc_id], q_size))
+        to_add = ((doc_id, f"title of {doc_id}"), cosine_similarity(d_vec, q_vec, body_index.doc_len[doc_id], q_size)) # TODO: replace body_index.doc_len[doc_id] to body_index.doc_vector_size[doc_id]
         cos_sim_lst.append(to_add)
     res = [x[0] for x in sorted(cos_sim_lst, lambda x: x[1], reverse=True)][:number_of_relevant_doc]
     # END SOLUTION

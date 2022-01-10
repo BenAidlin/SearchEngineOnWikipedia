@@ -11,7 +11,7 @@ which resulted in creating the following project. The project ran during 2 days 
   - create_title_index.ipynb
   - create_body_index_page_rank_doc_title.ipynb
   - create_anchor_index.ipynb
-- RunAppFiles - Contains all files neeeded to deploy the code into Google cloud compute engine, along with the RESTfull API supporting the requests, the virtual machine startup script. There are another 3 files provided to help examine the results with the "queris_train.json" file containing queries alongside their top wiki pages, and 2 .ipynb files that run the application and test the results.
+- RunAppFiles - Contains all files neeeded to deploy the code into Google cloud compute engine, along with the RESTfull API supporting the requests and the virtual machine startup script. There are another 3 files provided to help examine the results with the "queris_train.json" file containing queries alongside their top wiki pages, and 2 .ipynb files that run the application and test the results.
   - run_frontend_in_gcp.sh 
   - startup_script_gcp.sh
   - search_frontend_gcp.py
@@ -22,7 +22,7 @@ which resulted in creating the following project. The project ran during 2 days 
 ### Capabillities
 Through the engines end points, you can retrieve information using 5 different techniques:
 - Search: retrive information with a query, use both body and title index (0.65-0.35 ratio of results favoring the body). Also include page rank and page view consideration in return order.
-- Search body: retrive information only through the wiki page body. Use tf-idf measure for comparrison, with a tf-idf thresh of over 0.45 per term.
+- Search body: retrive information only through the wiki page body. Use tf-idf and cosine similarity measure for comparrison, with a tf-idf thresh of over 0.45 per term.
 - Serach title: retrive information only through the wiki page title. Use a binary ranking of terms existing or not in the title. More terms in title get priorotize.
 - Search anchor: retrive information only through the wiki page title. Use a binary ranking of terms existing or not in the title. More terms in title get priorotize.
 - Get pageview: retrive a specific wiki page amount of views.
@@ -40,7 +40,7 @@ Our search engine supports 5 different requests, including:
 
 ### Evaluation
 We evaluated our engine using MAP@40. The results reached an average of 0.55 at the submission of the project.
-Retrival time was 0.737 on average.
+Retrival time was 0.737 seconds on average.
 
 ![image](https://user-images.githubusercontent.com/74815296/148820529-6de58eeb-72ac-4646-b6b8-b004317ab8ec.png)
 

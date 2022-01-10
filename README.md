@@ -2,7 +2,7 @@
 Search engine project for IR course 2022, Shahar Kramer and Ben Aidlin.
 
 ### Intro
-During our 3rd year in the Information and Software Systems studies, we took a course at Information Retrieval.
+During our 3rd year in the Information and Software System Engineering studies, we took a course at Information Retrieval.
 In that course, we gained knowledge regarding different retrival, indexing, crawling and evaluation techiniques,
 which resulted in creating the following project. The project ran during 2 days on the gcp (Google cloud) compute engine, and answered queries through 5 different url's - retriving pages from the entire english wikipedia corpus. 
 

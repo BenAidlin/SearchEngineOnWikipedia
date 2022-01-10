@@ -174,4 +174,18 @@ def get_pageview():
 
 if __name__ == '__main__':
     # run the Flask RESTful API, make the server publicly available (host='0.0.0.0') on port 8080
+    print("fetching body index...")
+    get_body_index()
+    print("fetching title index...")
+    get_title_index()
+    print("fetching anchor index...")
+    get_anchor_index()
+    print("fetching page view...")
+    get_page_view()
+    print("fetching page ranks...")
+    get_docs_page_ranks_dict()
+    print("fetching doc titles...")
+    get_docs_titles()
+    print("done! starting application")
     app.run(host='0.0.0.0', port=8080, debug=False)
+    

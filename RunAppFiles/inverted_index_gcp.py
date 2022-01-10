@@ -1,4 +1,3 @@
-import pyspark
 import sys
 from collections import Counter, OrderedDict
 import itertools
@@ -104,7 +103,7 @@ def instead_of_lambda(x):
 
 class InvertedIndex:
     
-    DIR_NAME = "body_index/postings_gcp_body_index"
+    DIR_NAME = "anchor_index/postings_gcp_anchor_index"
     
     def __init__(self, docs={}):
         """ Initializes the inverted index and add documents to it (if provided).
@@ -188,12 +187,15 @@ class InvertedIndex:
             return posting_list
 
     @staticmethod
-    def read_index(bucket_name, index_route):
+    def read_pickle(bucket_name, pickle_route):
         client = storage.Client()
-        blob = client.bucket(bucket_name).blob(index_route)
+        blob = client.bucket(bucket_name).blob(pickle_route)
         pick = pickle.loads(blob.download_as_string())
         return pick
     
+    @staticmethod
+    def read_index(bucket_name, index_route):
+        return InvertedIndex.read_pickle(bucket_name, index_route)
     
 
     @staticmethod
@@ -250,4 +252,4 @@ class InvertedIndex:
         # load blob using json
         file = json.loads(blob.download_as_string())
         return file
-
+    
